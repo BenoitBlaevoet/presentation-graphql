@@ -1,0 +1,20 @@
+{
+  "name": "graphqlexample",
+  "version": "1.0.0",
+  "description": "web app & server to demonstrate graphql",
+  "main": "index.js",
+  "scripts": {
+    "start": "lerna run --parallel start"
+  },
+  "workspace": [
+    "packages/*"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "lerna": "^6.1.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}

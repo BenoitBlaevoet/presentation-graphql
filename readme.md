@@ -1,5 +1,7 @@
 # **Présentation**
 
+Introduction à graphql aux collègues de formation
+
 ## **GraphQL**
 
 [Readme graphql](./presentation/GraphQL.md)

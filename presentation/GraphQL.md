@@ -14,13 +14,79 @@ GraphQL est de plus en plus utilisé dans les applications web et mobiles modern
 
 ## **Exemple d'une requete GraphQL**
 
-![Requete graphql](./assets/requetegraphql.jpg)
+Schema déclaration des types
 
-![Schema graphql](./assets/schemagraphql.jpg)
+```graphql
+const typeDefs = `
 
-Dans cet exemple, la requête GraphQL demande des données sur un utilisateur avec un ID spécifique, ainsi que des informations sur ses publications et les commentaires associés. Le schéma définit les types de données utilisés dans la requête, notamment les types User, Post et Comment, ainsi que la façon dont ces types sont liés les uns aux autres.
+  type Poll {
+    id: ID
+    name: String
+    description: String
+    created_at: String
+    options: [Options]
+  }
 
-Lorsque la requête est exécutée, elle récupère les données de l'utilisateur et de ses publications, ainsi que les commentaires associés à chacune de ces publications. Le résultat de la requête est retourné sous forme de données structurées, qui peuvent être utilisées directement par l'application pour afficher les informations demandées.
+  type Options {
+    id : Int
+    name : String
+    polls_id : Int
+    poll : Poll
+  }
+  `
+
+```
+
+Déclaration des query & mutation
+```Javascript
+const Query = {
+  polls: async () => await prisma.Polls.findMany({}),
+  poll: async (parent, args) => await prisma.Polls.findUnique({
+    where: {
+      id: Number(args.id)
+    }
+  }),
+  options: async () => await prisma.Options.findMany({})
+}
+
+const Poll = {
+  id: (parent) => parent.id,
+  name: (parent) => parent.name,
+  description: (parent) => parent.description,
+  options: (parent, args) => {
+    return prisma.Options.findMany({
+      where: { polls_id: Number(parent.id) }
+    })
+  }
+}
+
+const Mutation = {
+  addPollWithOptions: async (_, { poll }, ctx, info) => {
+    try {
+      const resPoll = await prisma.polls.create({
+        data: {
+          name: poll.name,
+          description: poll.description,
+          options: {
+            create: poll.options
+          }
+        }
+      })
+      return { poll: resPoll }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+}
+
+const resolvers = {
+  Poll,
+  Query,
+  Mutation
+}
+
+```
 
 ---
 ## **Avantages et inconvenients :**

@@ -1,30 +1,34 @@
 'use strict'
 
-const Fastify = require('fastify')
-const mercurius = require('mercurius')
+import Fastify from 'fastify'
+import Mercurius from 'mercurius'
 
-const app = Fastify()
+import { schema } from './schema.js'
+import { resolvers } from './resolvers/index.js'
 
-const schema = `
-  type Query {
-    add(x: Int, y: Int): Int
-  }
-`
+const { fastify } = Fastify
+const { mercurius } = Mercurius
 
-const resolvers = {
-  Query: {
-    add: async (_, { x, y }) => x + y
-  }
-}
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+const app = fastify()
+
 
 app.register(mercurius, {
   schema,
-  resolvers
+  resolvers,
+  context: (request, reply) => {
+    return { prisma }
+  },
+  graphiql: true
 })
 
-app.get('/', async function (req, reply) {
-  const query = '{ add(x: 2, y: 2) }'
-  return reply.graphql(query)
+app.get('/hello', async function (req, reply) {
+  reply.send({
+    "hello":"world"
+  })
 })
 
 app.listen({ port: 3000 }, console.log("started"))

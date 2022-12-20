@@ -23,7 +23,7 @@ Dans cet exemple, la requête GraphQL demande des données sur un utilisateur av
 Lorsque la requête est exécutée, elle récupère les données de l'utilisateur et de ses publications, ainsi que les commentaires associés à chacune de ces publications. Le résultat de la requête est retourné sous forme de données structurées, qui peuvent être utilisées directement par l'application pour afficher les informations demandées.
 
 ---
-## **Avantages et inconvenients :**
+## **Avantages et inconvenients**
 
 ### **Les avantages de GraphQL par rapport aux alternatives incluent :**
 
@@ -40,3 +40,19 @@ Apprentissage : GraphQL peut être plus difficile à apprendre pour les dévelop
 Sécurité : GraphQL peut être plus difficile à sécuriser correctement que les alternatives, en particulier si les développeurs ne prennent pas en compte les bonnes pratiques de sécurité lors de la création des schémas et des resolvers. Cela peut augmenter les risques de faille de sécurité dans les applications.
 
 En résumé, GraphQL offre de nombreux avantages pour les applications qui ont besoin de flexibilité et d'efficacité dans la gestion des données, mais il peut présenter des challenges pour l'apprentissage et la sécurité.
+
+## **Ressources\***
+### **Articles**
+[GraphQL Server Basics: GraphQL Schemas, TypeDefs & Resolvers Explained](https://www.prisma.io/blog/graphql-server-basics-the-schema-ac5e2950214e) - Prisma blog
+
+### **GraphQL Server**
+[Apollo Server](https://www.apollographql.com/docs/apollo-server/)  
+[Mercurius](https://mercurius.dev/#/)  
+[express-graphql](https://github.com/graphql/express-graphql)
+
+### **GraphQL Client**
+[Apollo Client](https://www.apollographql.com/docs/react/)  
+[Apollo VueJS](https://apollo.vuejs.org/) - ❗ Support for Vue 3 is in progress in [Apollo VueJS v4](https://v4.apollo.vuejs.org/) at the time of writing.  
+[urql](https://formidable.com/open-source/urql/)
+
+\*All ressources are about graphQL in javascript ecosystem

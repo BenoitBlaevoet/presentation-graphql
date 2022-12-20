@@ -16,7 +16,7 @@ const query = {
       }
     })
   },
-  users: async(_parent, args, ctx) => {
+  users: async (_parent, args, ctx) => {
     return ctx.prisma.user.findMany({})
   }
 }

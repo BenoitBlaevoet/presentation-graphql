@@ -70,3 +70,4 @@ const subscription = {
 }
 
 export { mutation, subscription }
+// Have to do subscription to post and schema to work with the sub in helloworld view

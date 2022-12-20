@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useQuery, useMutation, gql } from '@urql/vue'
+import { useQuery, useMutation, useSubscription, gql } from '@urql/vue'
+
 import * as Quill from 'quill'
 
 const inputContent = ref('')
@@ -75,6 +76,33 @@ const res = useQuery({
 const fetching = ref(res.fetching)
 const data = ref(res.data)
 const error = ref(res.error)
+
+const newPosts = gql`
+  subscription PostsSub {
+    newPost{
+      id
+      title
+      content
+      author{
+        name
+      }
+    }
+  }
+`
+const handleSubscription = (posts, response) => {
+  return [response.newPosts, ...posts]
+}
+
+const Messages = () => {
+  const res = useSubscription({ query: newPosts }, handleSubscription)
+  if (!res.data) return
+  data.value = res.data
+  console.log(data.value)
+}
+
+onMounted(() => {
+  Messages()
+})
 
 </script>
 

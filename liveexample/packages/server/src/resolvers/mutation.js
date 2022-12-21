@@ -1,14 +1,30 @@
 const mutation = {
-  createDraft: (_parent, { data }, ctx) => {
+  createDraft: async (_parent, { data }, ctx) => {
     try {
-      console.log(data)
-      return ctx.prisma.post.create({
+      const post = await ctx.prisma.post.create({
         data: {
           title: data.title,
           content: data.content,
-          authorId: data.authorId
+          authorId: data.authorId,
+          published: true
         }
       })
+      const subpost = await ctx.prisma.post.findUnique({
+        where: {
+          id: post.id
+        },
+        include: {
+          author: true
+        }
+      })
+      await ctx.pubsub.publish({
+        topic: 'POST_ADDED',
+        payload: {
+          postAdded: subpost
+        }
+      })
+
+      return post
     } catch (error) {
       console.log(error)
     }
@@ -66,6 +82,10 @@ const subscription = {
   commentAdded: {
     subscribe: async (root, args, { pubsub }) =>
       await pubsub.subscribe('COMMENT_ADDED')
+  },
+  postAdded: {
+    subscribe: async (root, args, { pubsub }) =>
+      await pubsub.subscribe('POST_ADDED')
   }
 }
 

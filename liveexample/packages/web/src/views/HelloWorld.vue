@@ -2,11 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useQuery, useMutation, useSubscription, gql } from '@urql/vue'
 
+// Wysiwyg html editor
+// TODO: not working anymore i have to check why
 import * as Quill from 'quill'
-
-const inputContent = ref('')
-const inputTitle = ref('')
-
 function initQuill () {
   const editor = new Quill('#content-editor', {
     modules: {
@@ -22,42 +20,16 @@ function initQuill () {
   console.log(editor)
 }
 
-const MUTATION = gql`
-  mutation CreateDraft($data: PostInput){
-    createDraft(data: $data){
-      content
-      title
-      authorId
-    }
-  }
-`
-
-const variables = () => {
-  return {
-    data: {
-      title: inputTitle.value,
-      content: inputContent.value,
-      authorId: 3
-    }
-  }
-}
-
-const { executeMutation: createDraft } = useMutation(MUTATION)
-
 const clearInputs = () => {
   inputContent.value = ''
   document.querySelector('.ql-editor').innerHTML = ''
   inputTitle.value = ''
 }
+// Init reactive value to pair with input
+const inputContent = ref('')
+const inputTitle = ref('')
 
-onMounted(() => {
-  initQuill()
-  const editor = document.querySelector('.ql-editor')
-  editor.addEventListener('keyup', (e) => {
-    inputContent.value = e.target.innerHTML
-  })
-})
-
+// graphql query
 const res = useQuery({
   query: `
     {
@@ -73,13 +45,38 @@ const res = useQuery({
   `
 })
 
+// Init reactive value that store query result && status
 const fetching = ref(res.fetching)
 const data = ref(res.data)
 const error = ref(res.error)
 
+// GraphQl mutation query
+const MUTATION = gql`
+  mutation CreateDraft($data: PostInput){
+    createDraft(data: $data){
+      content
+      title
+      authorId
+    }
+  }
+`
+// Mutation variable
+const variables = () => {
+  return {
+    data: {
+      title: inputTitle.value,
+      content: inputContent.value,
+      authorId: 3
+    }
+  }
+}
+// Store the useMutation so we can trigger it later
+const { executeMutation: createDraft } = useMutation(MUTATION)
+
+// GraphQL subscription query
 const newPosts = gql`
   subscription PostsSub {
-    newPost{
+    postAdded{
       id
       title
       content
@@ -89,25 +86,39 @@ const newPosts = gql`
     }
   }
 `
-const handleSubscription = (posts, response) => {
-  return [response.newPosts, ...posts]
-}
+// subscription handler, i don't need it finally
+// const handleSubscription = (posts, response) => {
+//   console.log(posts)
+//   return [response.newPosts, ...posts]
+// }
 
-const Messages = () => {
-  const res = useSubscription({ query: newPosts }, handleSubscription)
-  if (!res.data) return
-  data.value = res.data
-  console.log(data.value)
-}
+// const Messages = () => {
+//   if (!res.data) {
+//     console.log('lol')
+//   }
+// }
+
+useSubscription({ query: newPosts })
 
 onMounted(() => {
-  Messages()
+  // Dom manipulation, so we wait that everything is initiated
+  initQuill()
+  const editor = document.querySelector('.ql-editor')
+  editor.addEventListener('keyup', (e) => {
+    inputContent.value = e.target.innerHTML
+  })
 })
 
 </script>
 
 <template>
-  <h1 class="ma-auto text-center p-8 text-5xl font-bold bg-indigo-500 shadow-sm text-white w-screen"> Présentation
+  <h1 class="
+    fixed w-full
+    ma-auto p-8
+    text-center text-5xl font-bold
+    bg-indigo-50 text-indigo-500 shadow-md
+    border-b-2 border-indigo-200/75"
+  > Présentation
     <span
       class="
         bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-rose-300 via-fuchsia-600 to-purple-200
@@ -116,8 +127,8 @@ onMounted(() => {
       "
     > GraphQL</span>
   </h1>
-  <div class="flex">
-    <div id="posts" class="w-7/12">
+  <div class="flex pt-36">
+    <div id="posts" class="w-1/2 ml-20">
       <div v-if="fetching" class="">
         Loading posts...
       </div>
@@ -142,8 +153,9 @@ onMounted(() => {
     </div>
     <div id="addPost"
         class="
+        fixed right-0
         bg-indigo-50 m-4 rounded-md
-        w-5/12 h-fit
+        w-2/5 h-fit
         "
       >
         <h2 class="bg-indigo-500 py-2 px-4 text-xl font-bold rounded-t-md text-white">

@@ -14,6 +14,7 @@ type Query {
   }
   type Subscription {
     commentAdded: Comment
+    postAdded: Post
   }
 
   type User {

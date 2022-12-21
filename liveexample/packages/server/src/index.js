@@ -13,6 +13,22 @@ const { mercurius } = Mercurius
 const prisma = new PrismaClient()
 
 const app = fastify()
+
+app.register(cors, {
+  origin: (origin, cb) => {
+    const hostname = new URL(origin).hostname
+    const authorizedList = ['localhost', '192.168.0.5']
+    console.log(hostname)
+    if (authorizedList.includes(hostname)) {
+      //  Request from localhost will pass
+      cb(null, true)
+      return
+    }
+    // Generate an error on other origins, disabling access
+    cb(new Error('Not allowed'), false)
+  }
+})
+
 app.register(mercurius, {
   schema,
   resolvers,
@@ -23,11 +39,8 @@ app.register(mercurius, {
   graphiql: true
 })
 
-app.register(cors)
-
-app.get('/gql', async function (req, reply) {
-  console.log(reply.graphql(req.query))
-  return reply.graphql(req.query)
+app.get('/test', async function (req, reply) {
+  return { hello: 'world' }
 })
 
-app.listen({ port: 3000 }, console.log('http://localhost:3000/graphiql'))
+app.listen({ port: 8000 }, console.log('http://localhost:8000/graphiql'))
